@@ -16,6 +16,10 @@ import re
 import json
 import urllib
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
+socrata_app_token = os.environ.get("SOCRATA_APP_TOKEN") # allows access to private datasets shared with the user app token tied to
+filters_dataset_domain = os.environ.get("FILTERS_DATASET_DOMAIN", "communities.socrata.com")
+filters_datasetid = os.environ.get("FILTERS_DATASETID", "b9dt-4hh2")
+
 import sys
 import logging
 
@@ -39,11 +43,30 @@ def about():
 import requests
 import re
 
-def validate_url(url):
+def validate_url(domain, datasetid, url):
     if not "$select" in url:
         return {"error": "$select required"}
     if "*" in url:
         return {"error": "* not allowed"}
+    if "$query" in url:
+        return {"error": "$query not allowed"}
+    dataset_filter = requests.get('https://%s/%s.json?$domain=%s&$datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)).json()
+    if dataset_filter:
+        dataset_filter = json.loads(dataset_filter[0]['filter'])
+        # get field names
+        columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
+        fieldnames = [item['fieldName'] for item in columns]
+        query_part = url[url.index('?')+1:]
+        query_parts = dict([item.split('=') for item in query_part.split('&')])
+        for fieldtype in re.findall('\$([a-z])=', url):
+            if not fieldtype+'_fields' in dataset_filter:
+                return {"error": "$%s not in filter" % (fieldtype)}
+            not_allowed_fieldnames = list(set(fieldnames) - set(dataset_filter[fieldtype+'_fields']))
+            
+            for fieldname in not_allowed_fieldnames:
+                if fieldname in query_parts['$'+fieldtype]:
+                    return {"error": "%s not allowed in $%s" % (fieldname, fieldtype)}
+                
     return
 
 def parse_url(url):
@@ -105,7 +128,7 @@ def for_socrata(domain, datasetid):
     if not "?" in request.url:
         return json.dumps({"error": "$select required"})
     url = 'https://%s/resource/%s.json%s' % (domain, datasetid, request.url[request.url.index('?'):])
-    is_error = validate_url(url)
+    is_error = validate_url(domain, datasetid, url)
     if is_error:
         return is_error
     url = parse_url(url)
