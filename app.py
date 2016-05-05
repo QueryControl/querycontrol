@@ -115,8 +115,12 @@ def for_socrata(domain, datasetid):
     else:
         return Response(json.dumps(url),  mimetype='application/json')
 
-
-
+@app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
+@cross_origin()
+def for_socrata_get_fieldnames(domain, datasetid):
+    columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
+    fieldnames = [item['fieldName'] for item in columns]
+    return Response(json.dumps(fieldnames),  mimetype='application/json')
 
 @app.errorhandler(404)
 def page_not_found(error):
