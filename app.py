@@ -146,7 +146,7 @@ def for_socrata(domain, datasetid):
     if isinstance(is_error, dict):
         return Response(json.dumps(is_error), mimetype='application/json')
     elif is_error:
-        url = is_error
+        url = str(is_error)
     url = parse_url(url)
     print url, isinstance(url, str), type(url)
     # this code is messy because during parsing if any custom stuff is done like the WHERE in a $select
