@@ -49,8 +49,8 @@ def validate_url(domain, datasetid, url):
     if "*" in url:
         return {"error": "* not allowed"}
     if "$query" in url:
-        return {"error": "$query not allowed"}
-    dataset_filter = requests.get('https://%s/%s.json?$domain=%s&$datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)).json()
+        return {"error": "$query not allowed"} 
+    dataset_filter = requests.get('https://%s/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)).json()
     if dataset_filter:
         dataset_filter = json.loads(dataset_filter[0]['filter'])
         # get field names
