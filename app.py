@@ -77,8 +77,16 @@ def validate_url(domain, datasetid, url):
                 if fieldname in query_parts['$'+fieldtype]:
                     return {"error": "%s not allowed in $%s" % (fieldname, fieldtype)}
         if as_fields_from_filter:
-            for field in as_fields_from_filter:
-                url = url.replace(field[1], field[0]+' as '+field[1])
+            parts = url.split('&')
+            for i, part in enumerate(parts):
+                for field in as_fields_from_filter:
+                    if '$select' in part:
+                        parts[i] = parts[i].replace('='+field[1], '='+field[0]+' as '+field[1])
+                        parts[i] = parts[i].replace(','+field[1], ','+field[0]+' as '+field[1])
+                    else:
+                        parts[i] = parts[i].replace('='+field[1], '='+field[0])
+                        parts[i] = parts[i].replace(','+field[1], ','+field[0])
+            url = '&'.join(parts)
         print url
         return url
     return
