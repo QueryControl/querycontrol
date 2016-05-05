@@ -78,7 +78,7 @@ def validate_url(domain, datasetid, url):
                     return {"error": "%s not allowed in $%s" % (fieldname, fieldtype)}
         if as_fields_from_filter:
             for field in as_fields_from_filter:
-                url = url.replace(field[1], field[0])
+                url = url.replace(field[1], field[0]+' as '+field[1])
                 return url
     return
 
