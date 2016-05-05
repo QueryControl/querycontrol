@@ -3,7 +3,7 @@ QueryControl
 
 QueryControl will be middleware for various database engines. The first engine being developed for is Socrata.
 
-The core idea behind QueryControl is data owners such as government agencies would be more willing to allow outsiders to analyze their data  if the outsiders couldn't access the underlying data.
+The core idea behind QueryControl is data owners such as government agencies would be more willing to allow outsiders to analyze their data within certain boundaries if the outsiders couldn't access the underlying data.
 
 At https://communities.socrata.com/dataset/QueryControl-filters-example/3meq-iszs is a dataset of query filters.
 
