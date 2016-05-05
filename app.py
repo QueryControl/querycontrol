@@ -61,17 +61,25 @@ def validate_url(domain, datasetid, url):
         fieldnames = [item['fieldName'] for item in columns]
         query_part = url[url.index('?')+1:]
         query_parts = dict([item.split('=') for item in query_part.split('&')])
+        as_fields_from_filter = []
         for fieldtype in re.findall('\$([a-z]+)=', url):
             if fieldtype in ['order', 'limit']:
                 continue
             if not fieldtype+'_fields' in dataset_filter:
                 return {"error": "$%s not in filter" % (fieldtype)}
+            for fieldname in dataset_filter[fieldtype+'_fields']:
+                if ' as ' in fieldname:
+                    parts = fieldname.split(' as ')
+                    as_fields_from_filter.append(parts)
             not_allowed_fieldnames = list(set(fieldnames) - set(dataset_filter[fieldtype+'_fields']))
             print fieldtype, not_allowed_fieldnames
             for fieldname in not_allowed_fieldnames:
                 if fieldname in query_parts['$'+fieldtype]:
                     return {"error": "%s not allowed in $%s" % (fieldname, fieldtype)}
-                
+        if as_fields_from_filter:
+            for field in as_fields_from_filter:
+                url = url.replace(field[1], field[0])
+                return url
     return
 
 def parse_url(url):
@@ -135,8 +143,10 @@ def for_socrata(domain, datasetid):
     url = 'https://%s/resource/%s.json%s' % (domain, datasetid, request.url[request.url.index('?'):])
     url = str(url)
     is_error = validate_url(domain, datasetid, url)
-    if is_error:
+    if isinstance(is_error, dict):
         return Response(json.dumps(is_error), mimetype='application/json')
+    elif is_error:
+        url = is_error
     url = parse_url(url)
     print url, isinstance(url, str), type(url)
     # this code is messy because during parsing if any custom stuff is done like the WHERE in a $select
