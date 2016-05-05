@@ -4,6 +4,8 @@
 flask
 flask-cors
 requests
+flask-sqlalchemy
+psycopg2
 
 # ----------------------
 # Testing
