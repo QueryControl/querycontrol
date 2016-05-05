@@ -52,18 +52,20 @@ def validate_url(domain, datasetid, url):
         return {"error": "$query not allowed"}
     print 'https://%s/resource/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)
     dataset_filter = requests.get('https://%s/resource/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)).json()
+    print 'dataset_filter', dataset_filter
     if dataset_filter:
         dataset_filter = json.loads(dataset_filter[0]['filter'])
+        print 'actual filter', dataset_filter
         # get field names
         columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
         fieldnames = [item['fieldName'] for item in columns]
         query_part = url[url.index('?')+1:]
         query_parts = dict([item.split('=') for item in query_part.split('&')])
-        for fieldtype in re.findall('\$([a-z])=', url):
+        for fieldtype in re.findall('\$([a-z]+)=', url):
             if not fieldtype+'_fields' in dataset_filter:
                 return {"error": "$%s not in filter" % (fieldtype)}
             not_allowed_fieldnames = list(set(fieldnames) - set(dataset_filter[fieldtype+'_fields']))
-            
+            print fieldtype, not_allowed_fieldnames
             for fieldname in not_allowed_fieldnames:
                 if fieldname in query_parts['$'+fieldtype]:
                     return {"error": "%s not allowed in $%s" % (fieldname, fieldtype)}
@@ -129,12 +131,16 @@ def for_socrata(domain, datasetid):
     if not "?" in request.url:
         return json.dumps({"error": "$select required"})
     url = 'https://%s/resource/%s.json%s' % (domain, datasetid, request.url[request.url.index('?'):])
+    url = str(url)
     is_error = validate_url(domain, datasetid, url)
     if is_error:
-        return is_error
+        return Response(json.dumps(is_error), mimetype='application/json')
     url = parse_url(url)
-    print url
+    print url, isinstance(url, str), type(url)
+    # this code is messy because during parsing if any custom stuff is done like the WHERE in a $select
+    # then rows are returned instead of a url
     if isinstance(url, str):
+        print 'is string'
         return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
     else:
         return Response(json.dumps(url),  mimetype='application/json')
