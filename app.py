@@ -111,9 +111,9 @@ def for_socrata(domain, datasetid):
     url = parse_url(url)
     print url
     if isinstance(url, str):
-        return json.dumps(requests.get(url).json())
+        return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
     else:
-        return json.dumps(url)
+        return Response(json.dumps(url),  mimetype='application/json')
 
 
 
