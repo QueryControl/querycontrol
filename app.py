@@ -62,6 +62,8 @@ def validate_url(domain, datasetid, url):
         query_part = url[url.index('?')+1:]
         query_parts = dict([item.split('=') for item in query_part.split('&')])
         for fieldtype in re.findall('\$([a-z]+)=', url):
+            if fieldtype in ['order', 'limit']:
+                continue
             if not fieldtype+'_fields' in dataset_filter:
                 return {"error": "$%s not in filter" % (fieldtype)}
             not_allowed_fieldnames = list(set(fieldnames) - set(dataset_filter[fieldtype+'_fields']))
