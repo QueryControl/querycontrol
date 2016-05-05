@@ -79,7 +79,8 @@ def validate_url(domain, datasetid, url):
         if as_fields_from_filter:
             for field in as_fields_from_filter:
                 url = url.replace(field[1], field[0]+' as '+field[1])
-                return url
+        print url
+        return url
     return
 
 def parse_url(url):
