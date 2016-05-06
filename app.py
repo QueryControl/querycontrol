@@ -18,10 +18,12 @@ import urllib
 from sodapy import Socrata
 from datetime import datetime
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
-socrata_app_token = os.environ.get("SOCRATA_APP_TOKEN") # allows access to private datasets shared with the user app token tied to
+socrata_app_token = os.environ.get("socrata_app_token") # allows access to private datasets shared with the user app token tied to
 # oauth for Socrata is unusable for us because it doesn't allow refreshing tokens
-socrata_username = os.environ.get("SOCRATA_USERNAME")
-socrata_password = os.environ.get("SOCRATA_PASSWORD")
+socrata_username = os.environ.get("socrata_username")
+socrata_password = os.environ.get("socrata_password")
+socrata_access_log_domain = os.environ.get("socrata_access_log_domain")
+socrata_access_log_datasetid = os.environ.get("socrata_access_log_datasetid")
 filters_dataset_domain = os.environ.get("FILTERS_DATASET_DOMAIN", "communities.socrata.com")
 filters_datasetid = os.environ.get("FILTERS_DATASETID", "b9dt-4hh2")
 
@@ -30,7 +32,7 @@ import logging
 
 @app.before_request
 def log_request():
-    if socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid:
+    if socrata_app_token and socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid:
         client = Socrata(socrata_access_log_domain, socrata_app_token, socrata_username, socrata_password)
         # fix this, see http://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
         if not request.headers.getlist("X-Forwarded-For"):
