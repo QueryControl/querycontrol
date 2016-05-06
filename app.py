@@ -60,7 +60,7 @@ def validate_url(domain, datasetid, url):
         columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
         fieldnames = [item['fieldName'] for item in columns]
         query_part = url[url.index('?')+1:]
-        query_parts = dict([item.split('=') for item in query_part.split('&')])
+        query_parts = dict([item.split('=')[:2] for item in query_part.split('&')])
         as_fields_from_filter = []
         for fieldtype in re.findall('\$([a-z]+)=', url):
             if fieldtype in ['order', 'limit']:
