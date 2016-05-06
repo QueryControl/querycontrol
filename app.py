@@ -47,7 +47,7 @@ def log_request():
         # See Socrata's time format https://support.socrata.com/hc/en-us/articles/202949918-Importing-Data-Types-and-You-
         dtnow = datetime.utcnow().isoformat()
         dtnow = dtnow[:dtnow.index('.')]+'Z' 
-        data = [{'datetime': datetime, 'ip_address': str(ip), 'url': url}]
+        data = [{'datetime': dtnow, 'ip_address': str(ip), 'url': url}]
         print data
         print 'upsert', client.upsert(socrata_access_log_datasetid, data)
         
