@@ -42,6 +42,7 @@ def log_request():
         else:
            ip = request.headers.getlist("X-Forwarded-For")[0]
         data = [{'datetime': datetime.utcnow().isoformat(), 'ip_address': str(ip), 'url': str(request.url)}]
+        print data
         print client.upsert(socrata_access_log_datasetid, data)
         
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
