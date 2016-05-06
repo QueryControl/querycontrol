@@ -17,9 +17,13 @@ Our filter allows us to count number of dispatch events per address as long as w
 
 http://querycontrol.herokuapp.com/forsocrata/data.seattle.gov/grwu-wqtk.json/?$select=:group_count&$group=address&$order=:group_count%20DESC&$limit=10
 
+`[{"count": "3354", "percentage": "0.64746159919540252100"}, {"count": "3166", "percentage": "0.61116977431504006600"}, {"count": "1829", "percentage": "0.35307312609671771300"}, {"count": "1775", "percentage": "0.34264887852469871000"}, {"count": "1683", "percentage": "0.32488904932792559400"}, {"count": "1213", "percentage": "0.23415948712701945700"}, {"count": "1206", "percentage": "0.23280819577509106700"}, {"count": "1180", "percentage": "0.22778911361078562100"}, {"count": "1158", "percentage": "0.22354219793329639800"}, {"count": "1061", "percentage": "0.20481716062800300400"}]`
+
 Our filter doesn't allow us to ask for number of events per address if we are asking for the address.
 
 http://querycontrol.herokuapp.com/forsocrata/data.seattle.gov/grwu-wqtk.json/?$select=address,:group_count&$group=address&$order=:group_count%20DESC&$limit=10
+
+`{"error": "address not allowed in $select"}`
 
 
 
