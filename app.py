@@ -161,7 +161,7 @@ def for_socrata(domain, datasetid):
     print url, isinstance(url, str), type(url)
     # this code is messy because during parsing if any custom stuff is done like the WHERE in a $select
     # then rows are returned instead of a url
-    if isinstance(url, str):
+    if isinstance(url, str) or isinstance(url, unicode):
         print 'is string'
         return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
     else:
