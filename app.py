@@ -32,6 +32,7 @@ import logging
 
 @app.before_request
 def log_request():
+    print socrata_app_token and socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid
     if socrata_app_token and socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid:
         client = Socrata(socrata_access_log_domain, socrata_app_token, socrata_username, socrata_password)
         # fix this, see http://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
@@ -40,7 +41,7 @@ def log_request():
         else:
            ip = request.headers.getlist("X-Forwarded-For")[0]
         data = [{'datetime': datetime.utcnow().isoformat(), 'ip_address': ip, 'url': request.url}]
-        client.upsert(socrata_access_log_datasetid, data)
+        print client.upsert(socrata_access_log_datasetid, data)
         
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
