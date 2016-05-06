@@ -46,8 +46,8 @@ import re
 def validate_url(domain, datasetid, url):
     if not "$select" in url:
         return {"error": "$select required"}
-    if "*" in url:
-        return {"error": "* not allowed"}
+    if re.search('[=,:]\s*\*', url):
+        return {"error": "selecting * or :* not allowed"}
     if "$query" in url:
         return {"error": "$query not allowed"}
     print 'https://%s/resource/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)
