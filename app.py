@@ -36,13 +36,15 @@ def log_request():
     print (socrata_app_token and socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid)
     if socrata_app_token and socrata_username and socrata_password and socrata_access_log_domain and socrata_access_log_datasetid:
         client = Socrata(socrata_access_log_domain, socrata_app_token, username=socrata_username, password=socrata_password)
-        print 'client = Socrata('+socrata_access_log_domain+', '+socrata_app_token+', username='+socrata_username+', password='+socrata_password+')'
+        
         # fix this, see http://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
         if not request.headers.getlist("X-Forwarded-For"):
            ip = request.remote_addr
         else:
            ip = request.headers.getlist("X-Forwarded-For")[0]
-        data = [{'datetime': datetime.utcnow().isoformat(), 'ip_address': str(ip), 'url': str(request.url)}]
+        # for some reason a space and a * is causing an error so will to try do a replacement
+        url = str(request.url).replace(" ", "%20")
+        data = [{'datetime': datetime.utcnow().isoformat(), 'ip_address': str(ip), 'url': url}]
         print data
         print 'upsert', client.upsert(socrata_access_log_datasetid, data)
         
