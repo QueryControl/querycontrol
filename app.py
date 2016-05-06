@@ -42,9 +42,11 @@ def log_request():
            ip = request.remote_addr
         else:
            ip = request.headers.getlist("X-Forwarded-For")[0]
-        # for some reason a space and a * is causing an error so will to try do a replacement
+        # for some reason a space and a * is causing an upsert error so am replacing space with %20
         url = str(request.url).replace(" ", "%20")
-        data = [{'datetime': datetime.utcnow().isoformat(), 'ip_address': str(ip), 'url': url}]
+        datetime = datetime.utcnow().isoformat()
+        datetime = datetime[:datetime.index('.')]+'Z'
+        data = [{'datetime': datetime, 'ip_address': str(ip), 'url': url}]
         print data
         print 'upsert', client.upsert(socrata_access_log_datasetid, data)
         
