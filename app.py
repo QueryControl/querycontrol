@@ -214,7 +214,7 @@ def for_socrata_sql():
         variable = f.replace('.', '_').replace('-', '_')
         locals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
         sql = sql.replace(f, 'FROM ' + variable)
-    return Response(json.dumps(pysqldf(sql, inmemory=False).to_json(orient='records')), mimetype='application/json')
+    return Response(json.dumps(pysqldf(sql).to_json(orient='records')), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
 @cross_origin()
