@@ -39,9 +39,9 @@ def log_request():
         
         # fix this, see http://esd.io/blog/flask-apps-heroku-real-ip-spoofing.html
         if not request.headers.getlist("X-Forwarded-For"):
-           ip = request.remote_addr
+            ip = request.remote_addr
         else:
-           ip = request.headers.getlist("X-Forwarded-For")[0]
+            ip = request.headers.getlist("X-Forwarded-For")[0]
         # for some reason a space and a * is causing an upsert error so am replacing space with %20
         url = str(request.url).replace(" ", "%20")
         # See Socrata's time format https://support.socrata.com/hc/en-us/articles/202949918-Importing-Data-Types-and-You-
@@ -195,6 +195,26 @@ def for_socrata(domain, datasetid):
     else:
         return Response(json.dumps(url),  mimetype='application/json')
 
+@app.route('/forsocrata/sql/')
+@cross_origin()
+def for_socrata_sql():
+    from pandasql import sqldf
+    pysqldf = lambda q: sqldf(q, locals())
+    import pandas as pd
+    import io
+    import requests
+    sql = request.args.get('q')
+    # we expect FROM [[ socrata_domain ]]:[[ dataset_id ]]
+    froms = re.findall('FROM ([a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+)', sql)
+    for f in froms:
+        fparts = f.split(':')
+        url = "http://%s/resource/%s.csv" % (fparts[0], fparts[1])
+        s = requests.get(url).content
+        variable = f.replace('.', '_').replace('-', '_')
+        locals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
+        sql = sql.replace(f, 'FROM ' + variable)
+    return Response(json.dumps(pysqldf(sql, inmemory=False).to_json(orient='records')), mimetype='application/json')
+    
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
 @cross_origin()
 def for_socrata_get_fieldnames(domain, datasetid):
