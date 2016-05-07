@@ -198,6 +198,7 @@ def for_socrata(domain, datasetid):
 @app.route('/forsocrata/sql/')
 @cross_origin()
 def for_socrata_sql():
+    print 'for socrata sql being ran'
     from pandasql import sqldf
     pysqldf = lambda q: sqldf(q, locals())
     import pandas as pd
