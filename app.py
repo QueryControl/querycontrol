@@ -200,20 +200,24 @@ def for_socrata(domain, datasetid):
 def for_socrata_sql():
     print 'for socrata sql being ran'
     from pandasql import sqldf
-    pysqldf = lambda q: sqldf(q, locals())
+    
     import pandas as pd
     import io
     import requests
     sql = request.args.get('q')
     # we expect FROM [[ socrata_domain ]]:[[ dataset_id ]]
-    froms = re.findall('FROM ([a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+)', sql)
+    froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
     for f in froms:
-        fparts = f.split(':')
+        fparts = f.split(' ')[1].split(':')
         url = "http://%s/resource/%s.csv" % (fparts[0], fparts[1])
         s = requests.get(url).content
-        variable = f.replace('.', '_').replace('-', '_')
-        locals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
+        variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
+        print variable
+        # changing globals() to locals() didn't work
+        globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
+        print globals()[variable]
         sql = sql.replace(f, 'FROM ' + variable)
+    pysqldf = lambda q: sqldf(q, globals())
     return Response(json.dumps(pysqldf(sql).to_json(orient='records')), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
