@@ -7,6 +7,7 @@ requests
 flask-sqlalchemy
 psycopg2
 sodapy
+pandasql
 
 # ----------------------
 # Testing
