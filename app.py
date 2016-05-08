@@ -239,7 +239,7 @@ def for_socrata_sql():
         if item in df.columns[:i]: Cols[i] = "toDROP"
     df.columns = Cols
     df = df.drop("toDROP",1)
-    return Response(json.dumps(df.to_json(orient='records')), mimetype='application/json')
+    return Response(df.to_json(orient='records'), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
 @cross_origin()
