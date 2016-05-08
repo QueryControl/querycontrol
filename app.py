@@ -202,7 +202,9 @@ def for_socrata_sql():
     from pandasql import sqldf
     import inspect
     print 'sqldf arguments', inspect.getargspec(sqldf)
-    pysqldf = lambda q: sqldf(q, globals(), db_uri='sqlite:///foo.db')
+    import string
+    dbid = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    pysqldf = lambda q: sqldf(q, globals(), db_uri='sqlite:///%s.db' % (dbid))
     #return 'trying to fix memory issue'
     import pandas as pd
     import io
