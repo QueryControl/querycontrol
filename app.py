@@ -238,7 +238,10 @@ def for_socrata_sql():
         
         if item in df.columns[:i]: Cols[i] = "toDROP"
     df.columns = Cols
-    df = df.drop("toDROP",1)
+    try:
+        df = df.drop("toDROP",1)
+    except:
+        pass 
     return Response(df.to_json(orient='records'), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
