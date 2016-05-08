@@ -211,6 +211,7 @@ def for_socrata_sql():
     # we expect FROM [[ socrata_domain ]]:[[ dataset_id ]]
     # SELECT * FROM data.seattle.gov:y7pv-r3kh JOIN data.seattle.gov:pu5n-trf4 ON data.seattle.gov:y7pv-r3kh.general_offense_number = data.seattle.gov:pu5n-trf4.general_offense_number
     froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
+    variables = []
     for f in froms:
         fparts = f.split(' ')[1].split(':')
         url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=50000" % (fparts[0], fparts[1])
@@ -218,6 +219,7 @@ def for_socrata_sql():
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
         #print variable
         # changing globals() to locals() didn't work
+        variables.append(variable)
         globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
         #print globals()[variable]
         sql = sql.replace(f, 'FROM ' + variable)
@@ -245,6 +247,8 @@ def for_socrata_sql():
         df = df.drop("toDROP",1)
     except:
         pass 
+    for variable in variables:
+        del globals()[variable]
     return Response(df.to_json(orient='records'), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
