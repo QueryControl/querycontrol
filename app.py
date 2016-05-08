@@ -216,7 +216,7 @@ def for_socrata_sql():
     variables = []
     for f in froms:
         fparts = f.split(' ')[1].split(':')
-        url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=50000" % (fparts[0], fparts[1])
+        url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=2000" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
         #print variable
