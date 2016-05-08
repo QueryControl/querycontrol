@@ -12,6 +12,7 @@ import flask
 app = Flask(__name__)
 from flask_cors import *
 import requests
+from requests.auth import HTTPBasicAuth
 import re
 import json
 import urllib
@@ -19,7 +20,7 @@ from sodapy import Socrata
 from datetime import datetime
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
 socrata_app_token = os.environ.get("socrata_app_token") # allows access to private datasets shared with the user app token tied to
-# oauth for Socrata is unusable for us because it doesn't allow refreshing tokens
+# oauth for Socrata is unusable for us because tokens expire in a short period of time and it doesn't allow refreshing tokens
 socrata_username = os.environ.get("socrata_username")
 socrata_password = os.environ.get("socrata_password")
 socrata_access_log_domain = os.environ.get("socrata_access_log_domain")
@@ -81,6 +82,8 @@ def validate_url(domain, datasetid, url):
     print 'https://%s/resource/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)
     dataset_filter = requests.get('https://%s/resource/%s.json?domain=%s&datasetid=%s' % (filters_dataset_domain, filters_datasetid, domain, datasetid)).json()
     print 'dataset_filter', dataset_filter
+    if requests.get('https://%s/resource/%s.json' % (domain, datasetid)).json() == {u'message': u'You must be logged in to access this resource', u'error': True} and not dataset_filter:
+        return {"error": "dataset requested is a private dataset without a filter so no public access is allowed"}
     if dataset_filter:
         dataset_filter = json.loads(dataset_filter[0]['filter'])
         print 'actual filter', dataset_filter
@@ -125,7 +128,10 @@ def parse_url(url):
             url = url.replace(":total_count", "count(*)")
         else:
             count_url = url[:url.find('.json')+5] + '?$select=count(*) as count'
-            total_count = requests.get(count_url).json()[0]['count']
+            if socrata_username and socrata_password:
+                total_count = requests.get(count_url, auth=HTTPBasicAuth(socrata_username, socrata_password)).json()[0]['count']
+            else:
+                total_count = requests.get(count_url).json()[0]['count']
             url = url.replace(":total_count", total_count)
     m = re.search(',:group_count WHERE \((?P<where_expression>.*?)\)/:group_count as (?P<as>[a-zA-Z]+)[,&]', urllib.unquote(url))
     if m:
@@ -146,8 +152,12 @@ def parse_url(url):
         denominator_url = modified_url.replace('[REPLACEWITHAS]', 'denominator')
         print denominator_url
         print "NU", numerator_url
-        numerators = requests.get(numerator_url).json()
-        denominators = requests.get(denominator_url).json()
+        if socrata_username and socrata_password:
+            numerators = requests.get(numerator_url, auth=HTTPBasicAuth(socrata_username, socrata_password)).json()
+            denominators = requests.get(denominator_url, auth=HTTPBasicAuth(socrata_username, socrata_password)).json()
+        else:
+            numerators = requests.get(numerator_url).json()
+            denominators = requests.get(denominator_url).json()
         percentages = []
         for row in numerators:
             print 'row', row
@@ -191,7 +201,10 @@ def for_socrata(domain, datasetid):
     # then rows are returned instead of a url
     if isinstance(url, str) or isinstance(url, unicode):
         print 'is string'
-        return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
+        if socrata_username and socrata_password:
+            return Response(json.dumps(requests.get(url).json(), auth=HTTPBasicAuth(socrata_username, socrata_password)),  mimetype='application/json')
+        else:
+            return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
     else:
         return Response(json.dumps(url),  mimetype='application/json')
 
