@@ -200,7 +200,7 @@ def for_socrata(domain, datasetid):
 def for_socrata_sql():
     print 'for socrata sql being ran'
     from pandasql import sqldf
-    
+    pysqldf = lambda q: sqldf(q, globals(), inmemory=False)
     import pandas as pd
     import io
     import requests
@@ -231,7 +231,7 @@ def for_socrata_sql():
         print globals()[variable]
         sql = sql.replace(f, 'JOIN ' + variable)
         sql = sql.replace(f.split(' ')[1], variable)
-    pysqldf = lambda q: sqldf(q, globals(), inmemory=False)
+    
     df = pysqldf(sql)
     Cols = list(df.columns)
     for i,item in enumerate(df.columns):
