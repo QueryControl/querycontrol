@@ -210,7 +210,7 @@ def for_socrata_sql():
     froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
     for f in froms:
         fparts = f.split(' ')[1].split(':')
-        url = "http://%s/resource/%s.csv" % (fparts[0], fparts[1])
+        url = "http://%s/resource/%s.csv?$order=:created_at DESC" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
         print variable
@@ -232,7 +232,14 @@ def for_socrata_sql():
         sql = sql.replace(f, 'JOIN ' + variable)
         sql = sql.replace(f.split(' ')[1], variable)
     pysqldf = lambda q: sqldf(q, globals())
-    return Response(json.dumps(pysqldf(sql).to_json(orient='records')), mimetype='application/json')
+    df = pysqldf(sql)
+    Cols = list(df.columns)
+    for i,item in enumerate(df.columns):
+        
+        if item in df.columns[:i]: Cols[i] = "toDROP"
+    df.columns = Cols
+    df = df.drop("toDROP",1)
+    return Response(json.dumps(df.to_json(orient='records')), mimetype='application/json')
     
 @app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
 @cross_origin()
