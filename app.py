@@ -200,7 +200,10 @@ def for_socrata(domain, datasetid):
 def for_socrata_sql():
     print 'for socrata sql being ran'
     from pandasql import sqldf
-    pysqldf = lambda q: sqldf(q, globals(), inmemory=False)
+    import inspect
+    print 'sqldf arguments', inspect.getargspec(sqldf)
+    pysqldf = lambda q: sqldf(q, globals(), db_uri='sqlite:///foo.db')
+    #return 'trying to fix memory issue'
     import pandas as pd
     import io
     import requests
@@ -213,10 +216,10 @@ def for_socrata_sql():
         url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=1000000" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
-        print variable
+        #print variable
         # changing globals() to locals() didn't work
         globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
-        print globals()[variable]
+        #print globals()[variable]
         sql = sql.replace(f, 'FROM ' + variable)
         sql = sql.replace(f.split(' ')[1], variable)
     froms = list(set(re.findall('JOIN [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
@@ -225,10 +228,10 @@ def for_socrata_sql():
         url = "http://%s/resource/%s.csv" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
-        print variable
+        #print variable
         # changing globals() to locals() didn't work
         globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
-        print globals()[variable]
+        #print globals()[variable]
         sql = sql.replace(f, 'JOIN ' + variable)
         sql = sql.replace(f.split(' ')[1], variable)
     
