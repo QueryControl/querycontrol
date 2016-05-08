@@ -210,7 +210,7 @@ def for_socrata_sql():
     froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
     for f in froms:
         fparts = f.split(' ')[1].split(':')
-        url = "http://%s/resource/%s.csv?$order=:created_at DESC" % (fparts[0], fparts[1])
+        url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=100000" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
         print variable
