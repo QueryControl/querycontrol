@@ -206,6 +206,7 @@ def for_socrata_sql():
     import requests
     sql = request.args.get('q')
     # we expect FROM [[ socrata_domain ]]:[[ dataset_id ]]
+    # SELECT * FROM data.seattle.gov:y7pv-r3kh JOIN data.seattle.gov:pu5n-trf4 ON data.seattle.gov:y7pv-r3kh.general_offense_number = data.seattle.gov:pu5n-trf4.general_offense_number
     froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
     for f in froms:
         fparts = f.split(' ')[1].split(':')
@@ -217,6 +218,19 @@ def for_socrata_sql():
         globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
         print globals()[variable]
         sql = sql.replace(f, 'FROM ' + variable)
+        sql = sql.replace(f.split(' ')[1], variable)
+    froms = list(set(re.findall('JOIN [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
+    for f in froms:
+        fparts = f.split(' ')[1].split(':')
+        url = "http://%s/resource/%s.csv" % (fparts[0], fparts[1])
+        s = requests.get(url).content
+        variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
+        print variable
+        # changing globals() to locals() didn't work
+        globals()[variable] = pd.read_csv(io.StringIO(s.decode('utf-8')))
+        print globals()[variable]
+        sql = sql.replace(f, 'JOIN ' + variable)
+        sql = sql.replace(f.split(' ')[1], variable)
     pysqldf = lambda q: sqldf(q, globals())
     return Response(json.dumps(pysqldf(sql).to_json(orient='records')), mimetype='application/json')
     
