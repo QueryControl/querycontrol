@@ -210,7 +210,7 @@ def for_socrata_sql():
     froms = list(set(re.findall('FROM [a-zA-Z0-9\.]+:[a-zA-Z0-9\-]+', sql)))
     for f in froms:
         fparts = f.split(' ')[1].split(':')
-        url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=5000" % (fparts[0], fparts[1])
+        url = "http://%s/resource/%s.csv?$order=:created_at DESC&$limit=1000000" % (fparts[0], fparts[1])
         s = requests.get(url).content
         variable = '_'.join(fparts).replace('.', '_').replace('-', '_')
         print variable
@@ -231,7 +231,7 @@ def for_socrata_sql():
         print globals()[variable]
         sql = sql.replace(f, 'JOIN ' + variable)
         sql = sql.replace(f.split(' ')[1], variable)
-    pysqldf = lambda q: sqldf(q, globals())
+    pysqldf = lambda q: sqldf(q, globals(), inmemory=False)
     df = pysqldf(sql)
     Cols = list(df.columns)
     for i,item in enumerate(df.columns):
