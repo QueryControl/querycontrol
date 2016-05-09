@@ -10,29 +10,9 @@ th, td {
 </style>
 <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
 <script>
-function showFilters() {
- 
-    url = 'https://querycontrol.herokuapp.com/forsocrata/owned_datasets/';
-      owned_datasets = JSON.parse($.ajax({
-            type: "GET",
-            url: url,
-            async: false
-        }).responseText);
-    $.each(owned_datasets, function(i, dataset) {
-       $('#owned_datasets').append('<option data-datasetid="'+dataset['id']+'">'+dataset['name']+'</option>');
-    });
-     // we will need to make this url come from settings
-  var url = 'https://communities.socrata.com/resource/3meq-iszs.json';
-  var data =  JSON.parse($.ajax({
-            type: "GET",
-            url: url,
-            async: false
-        }).responseText);
-  $.each(data, function(i, row) {
-    var dataset_filter = JSON.parse(row['filter']);
-    $('#editor').append('<h3>'+row['datasetid']+'</h3>');
-    $('#editor').append('<pre>'+JSON.stringify(dataset_filter)+'</pre>');
-    var editor_html = '<table><tr><th></th>';
+    function showFilter(row, dataset_filter) {
+        console.log(JSON.stringify(row));
+        var editor_html = '<table><tr><th></th>';
       url = 'https://querycontrol.herokuapp.com/forsocrata/'+row['domain']+'/'+row['datasetid']+'/fieldnames/';
       cols = JSON.parse($.ajax({
             type: "GET",
@@ -57,17 +37,48 @@ function showFilters() {
         editor_html += '</tr>';
     });
       editor_html += '</table>';
-      $('#editor').append(editor_html);
+        return editor_html;
+    }
+function showFilters() {
+ 
+    url = 'https://querycontrol.herokuapp.com/forsocrata/owned_datasets/';
+      owned_datasets = JSON.parse($.ajax({
+            type: "GET",
+            url: url,
+            async: false
+        }).responseText);
+    $.each(owned_datasets, function(i, dataset) {
+       $('#owned_datasets').append('<option data-datasetid="'+dataset['id']+'">'+dataset['name']+'</option>');
+    });
+     // we will need to make this url come from settings
+  var url = 'https://communities.socrata.com/resource/3meq-iszs.json';
+  var data =  JSON.parse($.ajax({
+            type: "GET",
+            url: url,
+            async: false
+        }).responseText);
+  $.each(data, function(i, row) {
+    var dataset_filter = JSON.parse(row['filter']);
+    $('#editor').append('<h3>'+row['datasetid']+'</h3>');
+    $('#editor').append('<pre>'+JSON.stringify(dataset_filter)+'</pre>');
+      $('#editor').append(showFilter(row, dataset_filter));
   });
 }
 
 $(function() {
   showFilters();
+    $('body').on('change', '#owned_datasets', function(e) {
+        console.log('selected');
+       datasetid = $(this).find(':selected').attr('data-datasetid');
+        row = {'datasetid': datasetid, 'domain': 'communities.socrata.com'};
+        $('#new_dataset_filter_editor').html(showFilter(row, {}));
+    });
 });
 </script>
 <div id="editor">
     <h3>Add a new filter</h3>
     <div>
         <strong>Dataset:</strong> <select id="owned_datasets"><option></option></select>
+        <div id="new_dataset_filter_editor"></div>
     </div>
 </div>

@@ -273,7 +273,10 @@ def for_socrata_sql():
 @app.route('/forsocrata/<domain>/<datasetid>/fieldnames/')
 @cross_origin()
 def for_socrata_get_fieldnames(domain, datasetid):
-    columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
+    if socrata_username and socrata_password:
+        columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid), auth=HTTPBasicAuth(socrata_username, socrata_password)).json()['columns']
+    else:
+        columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
     fieldnames = [item['fieldName'] for item in columns]
     return Response(json.dumps(fieldnames),  mimetype='application/json')
 
