@@ -37,7 +37,7 @@ function showFilters() {
         $.each(cols, function(i, col) {
             var checked = '';
             if (param in dataset_filter) {
-              if (col in dataset_filter[param]) {
+              if (dataset_filter[param].indexOf(col) > -1) {
                   checked = 'checked';
               }
             }
