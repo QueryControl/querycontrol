@@ -72,6 +72,10 @@ def about():
 import requests
 import re
 
+@app.route('/filter_editor/')
+def filter_editor():
+    return render_template('filter_editor.html')
+
 def validate_url(domain, datasetid, url):
     if not "$select" in url:
         return {"error": "$select required"}
