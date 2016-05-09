@@ -20,6 +20,7 @@ function showFilters() {
   $.each(data, function(i, row) {
     var dataset_filter = JSON.parse(row['filter']);
     $('#editor').append('<h3>'+row['datasetid']+'</h3>');
+    $('#editor').append('<pre>'+JSON.stringify(dataset_filter)+'</pre>');
     var editor_html = '<table><tr><th></th>';
       url = 'https://querycontrol.herokuapp.com/forsocrata/'+row['domain']+'/'+row['datasetid']+'/fieldnames/';
       cols = JSON.parse($.ajax({
