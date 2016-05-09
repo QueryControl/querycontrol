@@ -3,11 +3,11 @@
 function showFilters() {
   // we will need to make this url come from settings
   var url = 'https://communities.socrata.com/resource/3meq-iszs.json';
-  var data = JSON.parse($.ajax({
-            type: "GET",}
-            url: url, $(function() {
-            async: false showFilters();
-        }).responseText);})
+  var data =  JSON.parse($.ajax({
+            type: "GET",
+            url: url,
+            async: false
+        }).responseText);
   $.each(data, function(i, row) {
     var dataset_filter = JSON.parse(row['filter']);
     $('#editor').append('<h3>'+row['datasetid']+'</h3>');
