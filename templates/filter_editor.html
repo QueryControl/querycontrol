@@ -1,3 +1,4 @@
+
 <style>
     table {
         border-collapse:collapse;
@@ -36,8 +37,8 @@ function showFilters() {
       editor_html += '<tr><th>$'+param+'</th>';
         $.each(cols, function(i, col) {
             var checked = '';
-            if (param in dataset_filter) {
-              if (dataset_filter[param].indexOf(col) > -1) {
+            if (param+'_fields' in dataset_filter) {
+              if (dataset_filter[param+'_fields'].indexOf(col) > -1) {
                   checked = 'checked';
               }
             }
