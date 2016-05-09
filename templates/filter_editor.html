@@ -12,6 +12,12 @@ function showFilters() {
     var dataset_filter = JSON.parse(row['filter']);
     $('#editor').append('<h3>'+row['datasetid']+'</h3>');
     var editor_html = '<table><tr><th></th>';
+      url = 'https://querycontrol.heroku.com/forsocrata/'+row['domain']+'/'+row['datasetid']+'/fieldnames';
+      cols = JSON.parse($.ajax({
+            type: "GET",
+            url: url,
+            async: false
+        }).responseText);
       $.each(cols, function(i, col) {
           editor_html += '<th>'+col+'</th>';
       });
