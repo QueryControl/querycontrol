@@ -32,10 +32,16 @@ function showFilters() {
           editor_html += '<th>'+col+'</th>';
       });
       editor_html += '</tr>';
-    $.each(['$group', '$select', '$where'], function(i, param) {
-      editor_html += '<tr><th>'+param+'</th>';
+    $.each(['group', 'select', 'where'], function(i, param) {
+      editor_html += '<tr><th>$'+param+'</th>';
         $.each(cols, function(i, col) {
-          editor_html += '<td><input type="checkbox" /></td>';
+            var checked = '';
+            if (param in dataset_filter) {
+              if (col in dataset_filter[param]) {
+                  checked = 'checked';
+              }
+            }
+          editor_html += '<td><input type="checkbox" '+checked+'/></td>';
       });
         editor_html += '</tr>';
     });
