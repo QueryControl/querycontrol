@@ -270,7 +270,7 @@ def for_socrata_sql():
         del globals()[variable]
     return Response(df.to_json(orient='records'), mimetype='application/json')
     
-@app.route('/forsocrata/<domain>/<datasetid>.json/fieldnames/')
+@app.route('/forsocrata/<domain>/<datasetid>/fieldnames/')
 @cross_origin()
 def for_socrata_get_fieldnames(domain, datasetid):
     columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
