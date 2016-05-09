@@ -277,6 +277,13 @@ def for_socrata_get_fieldnames(domain, datasetid):
     fieldnames = [item['fieldName'] for item in columns]
     return Response(json.dumps(fieldnames),  mimetype='application/json')
 
+@app.route('/forsocrata/owned_datasets/')
+@cross_origin()
+def for_socrata_owned_datasets():
+    userid = requests.get("https://%s/api/users/current.json" % (socrata_access_log_domain), auth=HTTPBasicAuth('tim@insideyourgovernment.com', 'ssgmSsgm2!')).json()['id']
+    datasets = requests.get('https://%s/api/search/views.json?accessType=WEBSITE&limit=10&page=1&sortBy=newest&for_user=%s&nofederate=true&publication_stage%%5B%%5D=published&publication_stage%%5B%%5D=unpublished&id=%s&row_count=3' % (socrata_access_log_domain, userid, userid), auth=HTTPBasicAuth('tim@insideyourgovernment.com', 'ssgmSsgm2!')).json()['results']
+    return Response(json.dumps(datasetss), mimetype='application/json')
+
 @app.errorhandler(404)
 def page_not_found(error):
     """Custom 404 page."""
