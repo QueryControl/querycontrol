@@ -25,12 +25,12 @@ function showFilters() {
     $.each(['$group', '$select', '$where'], function(i, param) {
       editor_html += '<tr><th>'+param+'</th>';
         $.each(cols, function(i, col) {
-          editor_html += '<td><input type="checkbox" /> '+col+'</td>';
+          editor_html += '<td><input type="checkbox" /></td>';
       });
         editor_html += '</tr>';
     });
       editor_html += '</table>';
-      $('#editor').html(editor_html);
+      $('#editor').append(editor_html);
   });
 }
 
