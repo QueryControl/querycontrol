@@ -283,8 +283,8 @@ def for_socrata_get_fieldnames(domain, datasetid):
 @app.route('/forsocrata/owned_datasets/')
 @cross_origin()
 def for_socrata_owned_datasets():
-    userid = requests.get("https://%s/api/users/current.json" % (socrata_access_log_domain), auth=HTTPBasicAuth('tim@insideyourgovernment.com', '***REMOVED***')).json()['id']
-    datasets = requests.get('https://%s/api/search/views.json?accessType=WEBSITE&limit=10&page=1&sortBy=newest&for_user=%s&nofederate=true&publication_stage%%5B%%5D=published&publication_stage%%5B%%5D=unpublished&id=%s&row_count=3' % (socrata_access_log_domain, userid, userid), auth=HTTPBasicAuth('tim@insideyourgovernment.com', '***REMOVED***')).json()['results']
+    userid = requests.get("https://%s/api/users/current.json" % (socrata_access_log_domain), auth=HTTPBasicAuth(socrata_username, socrata_password)).json()['id']
+    datasets = requests.get('https://%s/api/search/views.json?accessType=WEBSITE&limit=10&page=1&sortBy=newest&for_user=%s&nofederate=true&publication_stage%%5B%%5D=published&publication_stage%%5B%%5D=unpublished&id=%s&row_count=3' % (socrata_access_log_domain, userid, userid), auth=HTTPBasicAuth(socrata_username, socrata_password)).json()['results']
     datasets = [dataset['view'] for dataset in datasets]
     return Response(json.dumps(datasets), mimetype='application/json')
 
