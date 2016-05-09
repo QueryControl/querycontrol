@@ -5,6 +5,10 @@ The mission of QueryControl as a company is to get data to those who need it qui
 
 The core idea behind QueryControl is data owners such as government agencies would be more willing to allow outsiders to analyze their data within various limits if the outsiders couldn't access the underlying data.
 
+## Warning about use of Socrata undocumented APIs
+
+QueryControl uses undocumented Socrata APIs. 
+
 ## Examples
 
 ### Dataset of unredacted addresses firefighters/paramedics were dispatched to
