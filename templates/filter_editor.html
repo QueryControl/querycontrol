@@ -32,7 +32,7 @@ th, td {
                   checked = 'checked';
               }
             }
-          editor_html += '<td><input type="checkbox" '+checked+'/></td>';
+          editor_html += '<td><input type="checkbox" data-param="'+param+'" data-col="'+col+'" data-datasetid="'+row['datasetid']+'" '+checked+'/></td>';
       });
         editor_html += '</tr>';
     });
