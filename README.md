@@ -7,7 +7,7 @@ The core idea behind QueryControl is data owners such as government agencies wou
 
 ## Warning about use of Socrata undocumented APIs
 
-QueryControl uses undocumented Socrata APIs. 
+QueryControl uses undocumented Socrata APIs to get column info for a given dataset and list of datasets including private ones. These APIs could break at any moment.
 
 ## Examples
 

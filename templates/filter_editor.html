@@ -32,7 +32,7 @@ th, td {
                   checked = 'checked';
               }
             }
-          editor_html += '<td><input type="checkbox" data-param="'+param+'" data-col="'+col+'" data-datasetid="'+row['datasetid']+'" '+checked+'/></td>';
+          editor_html += '<td><input type="checkbox" class="filter_checkbox" data-param="'+param+'" data-col="'+col+'" data-datasetid="'+row['datasetid']+'" '+checked+'/></td>';
       });
         editor_html += '</tr>';
     });
@@ -60,7 +60,7 @@ function showFilters() {
   $.each(data, function(i, row) {
     var dataset_filter = JSON.parse(row['filter']);
     $('#editor').append('<h3>'+row['datasetid']+'</h3>');
-    $('#editor').append('<pre>'+JSON.stringify(dataset_filter)+'</pre>');
+    $('#editor').append('<pre id="filter_json_'+row['datasetid']+'">'+JSON.stringify(dataset_filter)+'</pre>');
       $('#editor').append(showFilter(row, dataset_filter));
   });
 }
@@ -72,6 +72,17 @@ $(function() {
        datasetid = $(this).find(':selected').attr('data-datasetid');
         row = {'datasetid': datasetid, 'domain': 'communities.socrata.com'};
         $('#new_dataset_filter_editor').html(showFilter(row, {}));
+    });
+    $('body').on('change', '.filter_checkbox', function(e) {
+        datasetid = $(this).attr('data-datasetid');
+        filter_json = {}
+        $.each(['group', 'select', 'where'], function(i, param) {
+            filter_json[param] = [];
+            $('.filter_checkbox:checked[data-datasetid="'+datasetid+'"][data-param="'+param+'"]').each(function() {
+                filter_json[param].push($(this).attr('data-col'));
+            });
+            $('#filter_json_'+datasetid).text(JSON.stringify(filter_json));
+        });
     });
 });
 </script>
