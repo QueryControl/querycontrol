@@ -71,6 +71,7 @@ $(function() {
         console.log('selected');
        datasetid = $(this).find(':selected').attr('data-datasetid');
         row = {'datasetid': datasetid, 'domain': 'communities.socrata.com'};
+        $('.new_dataset_filter_json').attr('id', 'filter_json_'+datasetid);
         $('#new_dataset_filter_editor').html(showFilter(row, {}));
     });
     $('body').on('change', '.filter_checkbox', function(e) {
