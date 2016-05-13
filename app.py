@@ -92,7 +92,7 @@ def validate_url(domain, datasetid, url):
         dataset_filter = json.loads(dataset_filter[0]['filter'])
         print 'actual filter', dataset_filter
         # get field names
-        columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid)).json()['columns']
+        columns = requests.get('https://%s/api/views/%s.json' % (domain, datasetid), auth=HTTPBasicAuth(socrata_username, socrata_password)).json()['columns']
         fieldnames = [item['fieldName'] for item in columns]
         query_part = url[url.index('?')+1:]
         query_parts = dict([item.split('=')[:2] for item in query_part.split('&')])
