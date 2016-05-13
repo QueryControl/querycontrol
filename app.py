@@ -205,10 +205,7 @@ def for_socrata(domain, datasetid):
     # then rows are returned instead of a url
     if isinstance(url, str) or isinstance(url, unicode):
         print 'is string'
-        if socrata_username and socrata_password:
-            return Response(json.dumps(requests.get(url).json(), auth=HTTPBasicAuth(socrata_username, socrata_password)),  mimetype='application/json')
-        else:
-            return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
+        return Response(json.dumps(requests.get(url).json()),  mimetype='application/json')
     else:
         return Response(json.dumps(url),  mimetype='application/json')
 
